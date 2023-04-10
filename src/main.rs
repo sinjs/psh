@@ -80,8 +80,21 @@ fn interpreter() -> () {
     };
 
     let args = parse_args(command.clone());
+    let execute_result = execute_command(&args);
 
-    execute_command(&args).expect("Failed to execute command");
+    match execute_result {
+        Ok(()) => (),
+        Err(err) => {
+            match err {
+                CommandExecutionError::NotFound => {
+                    println!("{}: {}: command not found", NAME, &args[0]);
+                }
+                CommandExecutionError::ExitCode(code) => {
+                    println!("{}: {}: command exited with code {}", NAME, &args[0], code);
+                }
+            };
+        }
+    };
 
     dbg!(command, args);
 }
