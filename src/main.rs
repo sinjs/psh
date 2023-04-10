@@ -1,3 +1,4 @@
+mod commands;
 mod macros;
 use std::env;
 use std::io;
@@ -11,6 +12,12 @@ const TARGET: &str = "release";
 
 struct Config {
     pub no_greeting: bool,
+}
+
+#[derive(Debug)]
+enum CommandExecutionError<T> {
+    NotFound,
+    ExitCode(T),
 }
 
 fn parse_command(input: String) -> Option<String> {
@@ -41,6 +48,18 @@ fn parse_shell_args() -> Result<Vec<String>, ()> {
     Ok(shell_args)
 }
 
+fn execute_command(args: &Vec<String>) -> Result<(), CommandExecutionError<i32>> {
+    let cmd = &args[0];
+
+    match cmd.as_str() {
+        "exit" => match commands::exit(args) {
+            Ok(_) => Ok(()),
+            Err(exit_code) => Err(CommandExecutionError::ExitCode(exit_code)),
+        },
+        _ => Err(CommandExecutionError::NotFound),
+    }
+}
+
 fn interpreter() -> () {
     // TODO: support config(custom-prompt)
     flushprint!("{} ", ">");
@@ -53,6 +72,8 @@ fn interpreter() -> () {
     };
 
     let args = parse_args(command.clone());
+
+    execute_command(&args).expect("Failed to execute command");
 
     dbg!(command, args);
 }
