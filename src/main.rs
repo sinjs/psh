@@ -8,6 +8,10 @@ const TARGET: &str = "dev";
 #[cfg(not(debug_assertions))]
 const TARGET: &str = "release";
 
+struct Config {
+    pub no_greeting: bool,
+}
+
 fn parse_command(input: String) -> Option<String> {
     let trimmed = input.trim().to_string();
     if trimmed.len() == 0 {
@@ -33,21 +37,38 @@ fn parse_shell_args() -> Result<Vec<String>, ()> {
     shell_args.reverse();
     shell_args.pop();
     shell_args.reverse();
-
     Ok(shell_args)
+}
+
+fn interpreter() -> () {
+    let command = parse_command(read_line().unwrap());
+
+    let command = match command {
+        None => return,
+        Some(cmd) => cmd,
+    };
+
+    let args = parse_args(command.clone());
+
+    dbg!(command, args);
 }
 
 fn main() {
     let mut shell_args = parse_shell_args().expect("Failed to parse arguments");
     let mut shell_args_temp = shell_args.clone();
+    let mut config = Config { no_greeting: false };
 
     for (index, argument) in shell_args.iter_mut().enumerate() {
         if argument == &String::from("--no-greeting") {
+            config.no_greeting = true;
             // TODO: support config(custom-shell-greeting)
-            //               args(custom-shell-greeting)
-            println!("welcome to {} v{}-{}", NAME, VERSION, TARGET);
+            //                 args(custom-shell-greeting)
             shell_args_temp.remove(index);
         }
+    }
+
+    if !config.no_greeting {
+        println!("welcome to {} v{}-{}", NAME, VERSION, TARGET);
     }
 
     let shell_args = shell_args_temp;
@@ -55,15 +76,6 @@ fn main() {
     dbg!(shell_args);
 
     loop {
-        let command = parse_command(read_line().unwrap());
-
-        let command = match command {
-            None => continue,
-            Some(cmd) => cmd,
-        };
-
-        let args = parse_args(command.clone());
-
-        dbg!(command, args);
+        interpreter();
     }
 }
