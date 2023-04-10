@@ -1,3 +1,4 @@
+mod macros;
 use std::env;
 use std::io;
 
@@ -41,6 +42,9 @@ fn parse_shell_args() -> Result<Vec<String>, ()> {
 }
 
 fn interpreter() -> () {
+    // TODO: support config(custom-prompt)
+    flushprint!("{} ", ">");
+
     let command = parse_command(read_line().unwrap());
 
     let command = match command {
