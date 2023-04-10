@@ -2,6 +2,8 @@ mod commands;
 mod macros;
 use std::env;
 use std::io;
+use std::io::ErrorKind;
+use std::process;
 
 const NAME: &str = env!("CARGO_PKG_NAME");
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -48,6 +50,21 @@ fn parse_shell_args() -> Result<Vec<String>, ()> {
     Ok(shell_args)
 }
 
+fn try_execute_binary(args: &Vec<String>) -> Result<(), CommandExecutionError<i32>> {
+    let mut child = process::Command::new(&args[0]);
+    child.args(args.split_first().unwrap().1);
+
+    let spawned = child.spawn();
+
+    match spawned {
+        Ok(_) => Ok(()),
+        Err(err) => match err.kind() {
+            ErrorKind::NotFound => Err(CommandExecutionError::NotFound),
+            _ => panic!("Failed to execute command: {:?}", err),
+        },
+    }
+}
+
 fn execute_command(args: &Vec<String>) -> Result<(), CommandExecutionError<i32>> {
     let cmd = &args[0];
 
@@ -64,13 +81,13 @@ fn execute_command(args: &Vec<String>) -> Result<(), CommandExecutionError<i32>>
             Ok(_) => Ok(()),
             Err(exit_code) => Err(CommandExecutionError::ExitCode(exit_code)),
         },
-        _ => Err(CommandExecutionError::NotFound),
+        _ => try_execute_binary(&args),
     }
 }
 
 fn interpreter() -> () {
     // TODO: support config(custom-prompt)
-    flushprint!("{} ", ">");
+    flushprint!("{} ", "$");
 
     let command = parse_command(read_line().unwrap());
 
