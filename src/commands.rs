@@ -1,5 +1,7 @@
 use std::process::exit as process_exit;
 
+use crate::flushprint;
+
 pub fn exit(args: &Vec<String>) -> Result<i32, i32> {
     if args.len() == 1 {
         process_exit(0);
@@ -10,5 +12,11 @@ pub fn exit(args: &Vec<String>) -> Result<i32, i32> {
 
 pub fn version() -> Result<i32, i32> {
     println!("{} v{}-{}", super::NAME, super::VERSION, super::TARGET);
+    Ok(0)
+}
+
+pub fn help() -> Result<i32, i32> {
+    const HELP_TEXT: &str = include_str!("../data/help.txt");
+    flushprint!("{}", HELP_TEXT);
     Ok(0)
 }
