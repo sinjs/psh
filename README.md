@@ -8,7 +8,7 @@ welcome to the pene shell, a simple and fast shell made in rust.
 
 it's...
 
-- **p**owerful
+- ~~**p**owerful~~ not quite yet :)
 - **p**ortable and made for every operating system which supports the basic standard library
 - based on **p**eneos standard library
 
