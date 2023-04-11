@@ -1,8 +1,4 @@
-<center>
-
 # psh - the pene shell
-
-</center>
 
 welcome to the pene shell, a simple and fast shell made in rust.
 
