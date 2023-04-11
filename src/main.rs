@@ -57,7 +57,10 @@ fn try_execute_binary(args: &Vec<String>) -> Result<(), CommandExecutionError<i3
     let spawned = child.spawn();
 
     match spawned {
-        Ok(_) => Ok(()),
+        Ok(mut c) => {
+            c.wait().unwrap();
+            Ok(())
+        }
         Err(err) => match err.kind() {
             ErrorKind::NotFound => Err(CommandExecutionError::NotFound),
             _ => panic!("Failed to execute command: {:?}", err),
