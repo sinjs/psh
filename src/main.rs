@@ -51,12 +51,10 @@ fn parse_shell_args() -> Result<Vec<String>, ()> {
 }
 
 fn try_execute_binary(args: &Vec<String>) -> Result<(), CommandExecutionError<i32>> {
-    let mut child = process::Command::new(&args[0]);
-    child.args(args.split_first().unwrap().1);
+    let mut command = process::Command::new(&args[0]);
+    command.args(args.split_first().unwrap().1);
 
-    let spawned = child.spawn();
-
-    match spawned {
+    match command.spawn() {
         Ok(mut c) => {
             c.wait().unwrap();
             Ok(())
