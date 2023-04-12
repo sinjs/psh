@@ -1,5 +1,6 @@
 mod commands;
 mod macros;
+
 use std::env;
 use std::io;
 use std::io::ErrorKind;
@@ -83,6 +84,10 @@ fn execute_command(args: &Vec<String>) -> Result<(), CommandExecutionError<i32>>
             Err(exit_code) => Err(CommandExecutionError::ExitCode(exit_code)),
         },
         "ls" => match commands::ls() {
+            Ok(_) => Ok(()),
+            Err(exit_code) => Err(CommandExecutionError::ExitCode(exit_code)),
+        },
+        "cd" => match commands::cd(args) {
             Ok(_) => Ok(()),
             Err(exit_code) => Err(CommandExecutionError::ExitCode(exit_code)),
         },

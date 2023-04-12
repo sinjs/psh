@@ -35,3 +35,16 @@ pub fn ls() -> Result<i32, i32> {
 
     Ok(0)
 }
+
+pub fn cd(args: &Vec<String>) -> Result<i32, i32> {
+    if args.len() <= 1 {
+        println!("no arguments specified (see help)");
+        return Err(1);
+    }
+
+    let dir = args.get(1).unwrap();
+
+    env::set_current_dir(dir).unwrap();
+
+    Ok(0)
+}
