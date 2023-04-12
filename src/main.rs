@@ -82,6 +82,10 @@ fn execute_command(args: &Vec<String>) -> Result<(), CommandExecutionError<i32>>
             Ok(_) => Ok(()),
             Err(exit_code) => Err(CommandExecutionError::ExitCode(exit_code)),
         },
+        "ls" => match commands::ls() {
+            Ok(_) => Ok(()),
+            Err(exit_code) => Err(CommandExecutionError::ExitCode(exit_code)),
+        },
         _ => try_execute_binary(&args),
     }
 }

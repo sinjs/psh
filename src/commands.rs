@@ -1,3 +1,5 @@
+use std::env;
+use std::fs;
 use std::process::exit as process_exit;
 
 use crate::flushprint;
@@ -18,5 +20,18 @@ pub fn version() -> Result<i32, i32> {
 pub fn help() -> Result<i32, i32> {
     const HELP_TEXT: &str = include_str!("../data/help.txt");
     flushprint!("{}", HELP_TEXT);
+    Ok(0)
+}
+
+pub fn ls() -> Result<i32, i32> {
+    let cwd = env::current_dir().unwrap();
+    let contents = fs::read_dir(&cwd).unwrap();
+
+    for content in contents {
+        print!("{} ", content.unwrap().file_name().into_string().unwrap());
+    }
+
+    flushprint!("\n");
+
     Ok(0)
 }
