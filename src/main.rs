@@ -32,10 +32,11 @@ enum CommandExecutionError<T> {
 
 fn parse_command(input: String) -> Option<String> {
     let trimmed = input.trim().to_string();
-    if trimmed.len() == 0 {
-        return None;
+
+    match trimmed.len() {
+        0 => None,
+        _ => Some(trimmed),
     }
-    Some(trimmed)
 }
 
 fn read_line() -> Result<String, io::Error> {
