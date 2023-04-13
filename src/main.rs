@@ -1,10 +1,16 @@
 mod commands;
+mod config;
 mod macros;
 
+use config::create_config_object;
+use config::ConfigManager;
 use std::env;
 use std::io;
 use std::io::ErrorKind;
 use std::process;
+
+#[macro_use]
+extern crate lazy_static;
 
 const NAME: &str = env!("CARGO_PKG_NAME");
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -13,8 +19,9 @@ const TARGET: &str = "dev";
 #[cfg(not(debug_assertions))]
 const TARGET: &str = "release";
 
-struct Config {
-    pub no_greeting: bool,
+lazy_static! {
+    #[derive(Debug)]
+    pub static ref CONFIG: ConfigManager = create_config_object();
 }
 
 #[derive(Debug)]
@@ -41,14 +48,6 @@ fn read_line() -> Result<String, io::Error> {
 
 fn parse_args(command: String) -> Vec<String> {
     command.split_whitespace().map(|s| s.to_string()).collect()
-}
-
-fn parse_shell_args() -> Result<Vec<String>, ()> {
-    let mut shell_args: Vec<String> = env::args().collect();
-    shell_args.reverse();
-    shell_args.pop();
-    shell_args.reverse();
-    Ok(shell_args)
 }
 
 fn try_execute_binary(args: &Vec<String>) -> Result<(), CommandExecutionError<i32>> {
@@ -127,26 +126,11 @@ fn interpreter() -> () {
 }
 
 fn main() {
-    let mut shell_args = parse_shell_args().expect("Failed to parse arguments");
-    let mut shell_args_temp = shell_args.clone();
-    let mut config = Config { no_greeting: false };
-
-    for (index, argument) in shell_args.iter_mut().enumerate() {
-        if argument == &String::from("--no-greeting") {
-            config.no_greeting = true;
-            // TODO: support config(custom-shell-greeting)
-            //                 args(custom-shell-greeting)
-            shell_args_temp.remove(index);
-        }
-    }
-
-    if !config.no_greeting {
+    if !CONFIG.data.get_no_greeting() {
         println!("welcome to {} v{}-{}", NAME, VERSION, TARGET);
     }
 
-    let shell_args = shell_args_temp;
-
-    dbg!(shell_args);
+    dbg!(&CONFIG.data);
 
     loop {
         interpreter();
