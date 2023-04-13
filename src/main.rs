@@ -24,6 +24,18 @@ lazy_static! {
     pub static ref CONFIG: ConfigManager = create_config_object();
 }
 
+fn main() {
+    if !CONFIG.data.get_no_greeting() {
+        println!("welcome to {} v{}-{}", NAME, VERSION, TARGET);
+    }
+
+    dbg!(&CONFIG.data);
+
+    loop {
+        interpreter();
+    }
+}
+
 #[derive(Debug)]
 enum CommandExecutionError<T> {
     NotFound,
@@ -124,16 +136,4 @@ fn interpreter() -> () {
     };
 
     dbg!(command, args);
-}
-
-fn main() {
-    if !CONFIG.data.get_no_greeting() {
-        println!("welcome to {} v{}-{}", NAME, VERSION, TARGET);
-    }
-
-    dbg!(&CONFIG.data);
-
-    loop {
-        interpreter();
-    }
 }
