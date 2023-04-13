@@ -1,23 +1,16 @@
 mod commands;
 mod config;
+mod constants;
 mod macros;
 
 use config::create_config_object;
 use config::ConfigManager;
-use std::env;
 use std::io;
 use std::io::ErrorKind;
 use std::process;
 
 #[macro_use]
 extern crate lazy_static;
-
-const NAME: &str = env!("CARGO_PKG_NAME");
-const VERSION: &str = env!("CARGO_PKG_VERSION");
-#[cfg(debug_assertions)]
-const TARGET: &str = "dev";
-#[cfg(not(debug_assertions))]
-const TARGET: &str = "release";
 
 lazy_static! {
     #[derive(Debug)]
@@ -26,10 +19,15 @@ lazy_static! {
 
 fn main() {
     if !CONFIG.data.get_no_greeting() {
-        println!("welcome to {} v{}-{}", NAME, VERSION, TARGET);
+        println!(
+            "welcome to {} v{}-{}",
+            constants::NAME,
+            constants::VERSION,
+            constants::TARGET
+        );
     }
 
-    dbg!(&CONFIG.data);
+    cdbg(&CONFIG.data);
 
     loop {
         interpreter();
@@ -40,6 +38,12 @@ fn main() {
 enum CommandExecutionError<T> {
     NotFound,
     ExitCode(T),
+}
+
+fn cdbg(msg: impl std::fmt::Debug) {
+    if CONFIG.data.get_debug() {
+        dbg!(msg);
+    }
 }
 
 fn parse_command(input: String) -> Option<String> {
@@ -126,10 +130,15 @@ fn interpreter() -> () {
         Err(err) => {
             match err {
                 CommandExecutionError::NotFound => {
-                    println!("{}: {}: command not found", NAME, &args[0]);
+                    println!("{}: {}: command not found", constants::NAME, &args[0]);
                 }
                 CommandExecutionError::ExitCode(code) => {
-                    println!("{}: {}: command exited with code {}", NAME, &args[0], code);
+                    println!(
+                        "{}: {}: command exited with code {}",
+                        constants::NAME,
+                        &args[0],
+                        code
+                    );
                 }
             };
         }

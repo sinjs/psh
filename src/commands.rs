@@ -2,6 +2,7 @@ use std::env;
 use std::fs;
 use std::process::exit as process_exit;
 
+use crate::constants;
 use crate::flushprint;
 
 pub fn exit(args: &Vec<String>) -> Result<i32, i32> {
@@ -13,7 +14,12 @@ pub fn exit(args: &Vec<String>) -> Result<i32, i32> {
 }
 
 pub fn version() -> Result<i32, i32> {
-    println!("{} v{}-{}", super::NAME, super::VERSION, super::TARGET);
+    println!(
+        "{} v{}-{}",
+        constants::NAME,
+        constants::VERSION,
+        constants::TARGET
+    );
     Ok(0)
 }
 
