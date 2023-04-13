@@ -58,3 +58,8 @@ pub fn cd(args: &Vec<String>) -> Result<i32, i32> {
         }
     }
 }
+
+pub fn pwd() -> Result<i32, i32> {
+    println!("{}", env::current_dir().unwrap().display());
+    Ok(0)
+}

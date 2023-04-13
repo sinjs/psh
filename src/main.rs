@@ -3,7 +3,7 @@ mod config;
 mod constants;
 mod macros;
 
-use colored::control;
+use colored::*;
 use config::create_config_object;
 use config::ConfigManager;
 use std::io;
@@ -33,8 +33,13 @@ fn main() {
 
     cdbg(&CONFIG.data);
 
+    let mut has_failed = false;
+
     loop {
-        interpreter();
+        match interpreter(has_failed) {
+            Ok(_) => has_failed = false,
+            Err(_) => has_failed = true,
+        }
     }
 }
 
@@ -111,18 +116,30 @@ fn execute_command(args: &Vec<String>) -> Result<(), CommandExecutionError<i32>>
             Ok(_) => Ok(()),
             Err(exit_code) => Err(CommandExecutionError::ExitCode(exit_code)),
         },
+        "pwd" => match commands::pwd() {
+            Ok(_) => Ok(()),
+            Err(exit_code) => Err(CommandExecutionError::ExitCode(exit_code)),
+        },
         _ => try_execute_binary(&args),
     }
 }
 
-fn interpreter() -> () {
+fn interpreter(has_failed: bool) -> Result<(), ()> {
     // TODO: support config(custom-prompt)
-    flushprint!("{} ", "$");
+    flushprint!(
+        "{} ",
+        (|| {
+            match has_failed {
+                true => "$".bright_red(),
+                false => "$".into(),
+            }
+        })()
+    );
 
     let command = parse_command(read_line().unwrap());
 
     let command = match command {
-        None => return,
+        None => return Ok(()),
         Some(cmd) => cmd,
     };
 
@@ -130,23 +147,21 @@ fn interpreter() -> () {
     let execute_result = execute_command(&args);
 
     match execute_result {
-        Ok(()) => (),
-        Err(err) => {
-            match err {
-                CommandExecutionError::NotFound => {
-                    println!("{}: {}: command not found", constants::NAME, &args[0]);
-                }
-                CommandExecutionError::ExitCode(code) => {
-                    println!(
-                        "{}: {}: command exited with code {}",
-                        constants::NAME,
-                        &args[0],
-                        code
-                    );
-                }
-            };
-        }
-    };
-
-    dbg!(command, args);
+        Ok(()) => Ok(()),
+        Err(err) => match err {
+            CommandExecutionError::NotFound => {
+                println!("{}: {}: command not found", constants::NAME, &args[0]);
+                Err(())
+            }
+            CommandExecutionError::ExitCode(code) => {
+                println!(
+                    "{}: {}: command exited with code {}",
+                    constants::NAME,
+                    &args[0],
+                    code
+                );
+                Err(())
+            }
+        },
+    }
 }
