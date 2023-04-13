@@ -53,7 +53,7 @@ pub fn cd(args: &Vec<String>) -> Result<i32, i32> {
     match env::set_current_dir(dir) {
         Ok(_) => Ok(0),
         Err(err) => {
-            println!("psh: cd: {}: {}", dir, err.to_string());
+            eprintln!("psh: cd: {}: {}", dir, err.to_string());
             Err(1)
         }
     }

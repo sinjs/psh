@@ -153,11 +153,11 @@ fn interpreter(has_failed: bool) -> Result<(), ()> {
         Ok(()) => Ok(()),
         Err(err) => match err {
             CommandExecutionError::NotFound => {
-                println!("{}: {}: command not found", constants::NAME, &args[0]);
+                eprintln!("{}: {}: command not found", constants::NAME, &args[0]);
                 Err(())
             }
             CommandExecutionError::ExitCode(code) => {
-                println!(
+                eprintln!(
                     "{}: {}: command exited with code {}",
                     constants::NAME,
                     &args[0],
