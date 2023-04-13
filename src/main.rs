@@ -3,6 +3,7 @@ mod config;
 mod constants;
 mod macros;
 
+use colored::control;
 use config::create_config_object;
 use config::ConfigManager;
 use std::io;
@@ -18,6 +19,9 @@ lazy_static! {
 }
 
 fn main() {
+    #[cfg(windows)]
+    control::set_virtual_terminal(true).unwrap();
+
     if !CONFIG.data.get_no_greeting() {
         println!(
             "welcome to {} v{}-{}",
