@@ -25,8 +25,8 @@ pub fn create_config_object() -> ConfigManager {
 
 #[derive(Debug)]
 pub struct ConfigData {
-    debug: bool,
-    no_greeting: bool,
+    pub debug: bool,
+    pub no_greeting: bool,
 }
 
 impl ConfigData {

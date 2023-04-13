@@ -3,6 +3,9 @@ mod config;
 mod constants;
 mod macros;
 
+#[cfg(test)]
+mod test;
+
 use colored::*;
 use config::create_config_object;
 use config::ConfigManager;
