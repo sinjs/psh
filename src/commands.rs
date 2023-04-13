@@ -44,7 +44,11 @@ pub fn cd(args: &Vec<String>) -> Result<i32, i32> {
 
     let dir = args.get(1).unwrap();
 
-    env::set_current_dir(dir).unwrap();
-
-    Ok(0)
+    match env::set_current_dir(dir) {
+        Ok(_) => Ok(0),
+        Err(err) => {
+            println!("psh: cd: {}: {}", dir, err.to_string());
+            Err(1)
+        }
+    }
 }
