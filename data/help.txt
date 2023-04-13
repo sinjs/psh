@@ -5,6 +5,8 @@ argument types: s = string n = number b = boolean
     help                Shows help
     exit n[exit_code]   Exits the shell or script with the exit code provided (default: 0)
     version             Displays the version of the application
+    cd s{path}          Changes the current working directory to the path provided
+    ls                  Lists the items in the current directory
 
 this application is licensed under the BSD-3-Clause license
 source code and contributions: https://github.com/sinjs/psh
