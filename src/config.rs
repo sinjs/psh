@@ -6,28 +6,35 @@ use std::collections::HashMap;
 use std::env;
 use std::io;
 use std::path::Path;
+use std::str::FromStr;
 
 type FileConfig<'group_key> = HashMap<&'group_key str, HashMap<String, String>>;
 
+fn flags_get_boolean(flags: &HashMap<String, String>, flag: &str, default: bool) -> bool {
+    FromStr::from_str(flags.get(flag).unwrap_or(&String::new())).unwrap_or(default)
+}
+
 pub fn create_config_object() -> ConfigManager {
-    read_pshrc_to_map();
+    let rc = read_pshrc_to_map();
+    let binding = &HashMap::new();
+    let rc_flags = rc.get("flags").unwrap_or(binding);
     let mut argv: Vec<String> = env::args().collect();
     let mut data = ConfigData {
-        debug: false,
-        no_greeting: false,
+        debug: flags_get_boolean(rc_flags, "debug", false),
+        no_greeting: flags_get_boolean(rc_flags, "no_greeting", false),
     };
 
     argv.remove(0);
     let argv = argv;
 
     for arg in argv.iter() {
-        if arg == &String::from("--no-greeting") {
-            data.set_no_greeting(true);
-        }
-
-        if arg == &String::from("--debug") {
-            data.set_debug(true);
-        }
+        match arg.as_str() {
+            "--no-greeting" => data.set_no_greeting(true),
+            "--greeting" => data.set_no_greeting(false),
+            "--debug" => data.set_debug(true),
+            "--no-debug" => data.set_debug(false),
+            _ => (),
+        };
     }
 
     ConfigManager { data }
@@ -130,8 +137,6 @@ pub fn read_pshrc_to_map<'group_key>() -> FileConfig<'group_key> {
             }
         }
     };
-
-    dbg!(&map);
 
     map
 }
